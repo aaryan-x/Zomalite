@@ -1,0 +1,42 @@
+version: "3.0"
+
+services:
+  backend:
+    build: ./backend
+    networks:
+      - dass
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URI: "mongodb://root:example@mongo:27017/admin"
+      SECRET: "wowbhaiya"
+
+  mongo:
+    image: mongo:latest
+    networks:
+      - dass
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  frontend:
+    build: ./frontend
+    networks:
+      - dass
+    depends_on:
+      - backend
+
+  nginx:
+    image: nginx:latest
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - dass
+    ports:
+      - "8000:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+
+networks:
+  dass:
